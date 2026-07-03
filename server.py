@@ -36,6 +36,8 @@ def processline(line):
         lines.append(f"<footer><small>{content}</small></footer>")
     elif tag == "link":
         lines.append(f'<p><a href="{content}" target="_blank" rel="noopener noreferrer">{content}</a></p>')
+    elif tag == "image":
+        lines.append(f'<p><img src="{content}" alt="Description of the image"></p>')
     elif tag == "pagelink":
         lines.append(f'<p><a href="/{content}">{content}</a></p>')
     elif tag == "code":
