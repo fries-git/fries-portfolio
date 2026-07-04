@@ -5,6 +5,13 @@ from waitress import serve
 folder = Path(__file__).parent / "sites"
 app = Flask(__name__, template_folder="sites")
 
+def makefile(filetoprocess):
+    with open(f"sites/{filetoprocess}", "a") as f:
+        debug = 1
+        for line in file.read_text().splitlines():
+            processline (line)
+            lines.append("\n")
+
 def processline(line):
     debug = 1
     print(f"Processing line: {line} at number {debug}")
@@ -39,7 +46,7 @@ def processline(line):
     elif tag == "image":
         lines.append(f'<p><img src="{content}" alt="Description of the image"></p>')
     elif tag == "pagelink":
-        lines.append(f'<p><a href="/{content}">{content}</a></p>')
+        lines.append(f'<nav><a href="/{content}">{content}</a></nav>')
     elif tag == "code":
         lines.append(f"<p><code>{content}</code></p>")
     elif tag == "small":
@@ -59,12 +66,9 @@ for file in folder.glob("*.sw"):
     lines = []
     print(f"Found file: {file.name}")
     fileedit = ((file.with_suffix(".html")).name)
-    with open(f"sites/{fileedit}", "a") as f:
-        debug = 1
-        for line in file.read_text().splitlines():
-            processline (line)
-            lines.append("\n")
-            
+
+    makefile(fileedit)
+
     with open(f"sites/{fileedit}", "w") as f:
         f.write("<html><body>")
         f.write('<link rel="stylesheet" href="/static/styles.css">')
