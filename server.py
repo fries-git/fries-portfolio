@@ -6,15 +6,13 @@ folder = Path(__file__).parent / "sites"
 app = Flask(__name__, template_folder="sites")
 
 def makefile(filetoprocess):
-    with open(f"sites/{filetoprocess}", "a") as f:
-        debug = 1
+    with open(f"sites/{filetoprocess}.sw", "a") as f:
         for line in file.read_text().splitlines():
             processline (line)
             lines.append("\n")
 
 def processline(line):
     debug = 1
-    print(f"Processing line: {line} at number {debug}")
     debug += 1
     start = line.find("[") + 1
     end = line.find("]")
@@ -28,7 +26,6 @@ def processline(line):
     if start > 0 and end > start:
         result = line[start:end]
     content = result
-    print(result)
 
     # The block...
     if tag == "header":
@@ -64,12 +61,10 @@ def processline(line):
 
 for file in folder.glob("*.sw"):
     lines = []
-    print(f"Found file: {file.name}")
-    fileedit = ((file.with_suffix(".html")).name)
+    print(f"Found file: {file.stem}")
+    makefile(file.stem)
 
-    makefile(fileedit)
-
-    with open(f"sites/{fileedit}", "w") as f:
+    with open(f"sites/{file.stem}.html", "w") as f:
         f.write("<html><body>")
         f.write('<link rel="stylesheet" href="/static/styles.css">')
         f.write("".join(lines))
@@ -77,23 +72,19 @@ for file in folder.glob("*.sw"):
 
 @app.route("/")
 def home():
+    print(f"Rebuilding: home")
+    makefile(f"home")
+    return send_from_directory(folder, f"home.html")
     file_path = folder / 'home.html'
     if not file_path.exists():
         abort(404)
     return file_path.read_text()
 
-@app.route("/source/<path:filename>")
-def source(filename):
-    return send_from_directory(folder, filename, mimetype="text/plain")
-
 @app.route("/<page>")
 def serve_page(page):
-    file_path = folder / f"{page}.html"
-
-    if not file_path.exists():
-        abort(404)
-
-    return file_path.read_text()
+    print(f"Rebuilding: {page}")
+    makefile(f"{page}")
+    return send_from_directory(folder, f"{page}.html")
 
 if __name__ == "__main__":
     serve(app, host="0.0.0.0", port=8080)
